@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Langue</title>
+<style>
+:root{--bg:#000;--card:rgba(120,120,120,0.14);--card-border:rgba(255,255,255,0.12);--accent-check:#3ddc84;}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto}
+.icon{width:19px;height:19px;stroke:#eee;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 18px}
+.header span{font-size:17px;font-weight:500;color:#fff}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:14px;padding:10px 14px;margin-bottom:16px}
+.search svg{stroke:#9a9a9a;width:17px;height:17px}
+.search input{background:transparent;border:none;outline:none;color:#fff;font-size:14px;width:100%}
+.search input::placeholder{color:#8f8f8f}
+.group-label{font-size:12px;color:#999;padding:0 4px 8px;letter-spacing:.03em}
+.current{display:flex;align-items:center;justify-content:space-between;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid rgba(27,77,46,0.5);border-radius:16px;padding:14px 16px;margin-bottom:20px}
+.current .left{display:flex;align-items:center;gap:12px}
+.current .flag{font-size:20px}
+.current .name{font-size:14px;color:#fff}
+.current .sub{font-size:12px;color:#9a9a9a;margin-top:1px}
+.current svg{stroke:var(--accent-check);width:18px;height:18px}
+.list-card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;overflow:hidden}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-bottom:0.5px solid rgba(255,255,255,0.08);cursor:pointer}
+.row:last-child{border-bottom:none}
+.row .left{display:flex;align-items:center;gap:12px}
+.row .flag{font-size:20px}
+.row .name{font-size:14px;color:#eee}
+.row .sub{font-size:12px;color:#8f8f8f;margin-top:1px}
+.row svg{stroke:var(--accent-check);width:16px;height:16px;visibility:hidden}
+.row.selected svg{visibility:visible}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span id="t-title">Langue</span></div>
+
+<div class="search">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="text" id="search-input">
+</div>
+
+<div class="group-label" id="t-current-label">langue actuelle</div>
+<div class="current" id="current-lang"></div>
+
+<div class="group-label" id="t-all-label">toutes les langues</div>
+<div class="list-card" id="lang-list"></div>
+
+<script>
+/* ============================================================
+   BACKEND À BRANCHER :
+   - Remplacer STORAGE_KEY / localStorage par le vrai réglage de
+     langue du compte (ex: PUT /api/users/me { locale: 'en' }).
+   - IMPORTANT : sélectionner une langue doit changer TOUS les
+     textes de l'application entière, pas seulement cet écran.
+     Ici, l'objet I18N + updateUiTexts() montre le principe :
+     chaque texte de CETTE page est lié à une clé de traduction.
+     Dans la vraie app, appliquer le même principe à tous les
+     écrans (un fichier de traduction global + un state de langue
+     partagé, ex: i18next / react-intl).
+   ============================================================ */
+
+const STORAGE_KEY = 'viewcoin_user_language';
+
+const languages = [
+  { code:"fr", flag: "🇫🇷", name: "Français", sub: "France" },
+  { code:"en", flag: "🇬🇧", name: "English", sub: "Anglais" },
+  { code:"es", flag: "🇪🇸", name: "Español", sub: "Espagnol" },
+  { code:"de", flag: "🇩🇪", name: "Deutsch", sub: "Allemand" },
+  { code:"pt", flag: "🇵🇹", name: "Português", sub: "Portugais" },
+  { code:"it", flag: "🇮🇹", name: "Italiano", sub: "Italien" },
+  { code:"ar", flag: "🇸🇦", name: "العربية", sub: "Arabe" },
+  { code:"tr", flag: "🇹🇷", name: "Türkçe", sub: "Turc" },
+  { code:"zh", flag: "🇨🇳", name: "中文", sub: "Chinois" },
+];
+
+// Démonstration : seuls les textes de CET écran sont traduits ici.
+// Dans l'app réelle, remplacer par le fichier de traduction global.
+const I18N = {
+  fr: { title:"Langue", current:"langue actuelle", all:"toutes les langues", search:"Rechercher une langue" },
+  en: { title:"Language", current:"current language", all:"all languages", search:"Search a language" },
+  es: { title:"Idioma", current:"idioma actual", all:"todos los idiomas", search:"Buscar un idioma" },
+};
+
+function getCurrentCode(){ return localStorage.getItem(STORAGE_KEY) || "fr"; }
+
+function updateUiTexts(){
+  const code = getCurrentCode();
+  const t = I18N[code] || I18N.fr;
+  document.getElementById('t-title').textContent = t.title;
+  document.getElementById('t-current-label').textContent = t.current;
+  document.getElementById('t-all-label').textContent = t.all;
+  document.getElementById('search-input').placeholder = t.search;
+}
+
+function setCurrentCode(code){
+  localStorage.setItem(STORAGE_KEY, code);
+  renderCurrent();
+  renderList(document.getElementById('search-input').value);
+  updateUiTexts();
+}
+
+function renderCurrent(){
+  const l = languages.find(x => x.code === getCurrentCode()) || languages[0];
+  document.getElementById('current-lang').innerHTML = `
+    <div class="left"><span class="flag">${l.flag}</span><div><div class="name">${l.name}</div><div class="sub">${l.sub}</div></div></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+  `;
+}
+
+function renderList(filter=''){
+  const list = document.getElementById('lang-list');
+  list.innerHTML = '';
+  const q = filter.toLowerCase();
+  languages.filter(l => l.name.toLowerCase().includes(q) || l.sub.toLowerCase().includes(q)).forEach(l => {
+    const row = document.createElement('div');
+    row.className = 'row' + (l.code === getCurrentCode() ? ' selected' : '');
+    row.innerHTML = `
+      <div class="left"><span class="flag">${l.flag}</span><div><div class="name">${l.name}</div><div class="sub">${l.sub}</div></div></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    `;
+    row.addEventListener('click', () => setCurrentCode(l.code));
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('search-input').addEventListener('input', e => renderList(e.target.value));
+
+renderCurrent();
+renderList();
+updateUiTexts();
+</script>
+</body></html>

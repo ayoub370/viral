@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Appareils connectés</title>
+<style>
+:root{--bg:#000;--card:rgba(120,120,120,0.14);--card-border:rgba(255,255,255,0.12);--accent:#1b4d2e;--accent-check:#3ddc84;}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto}
+.icon{width:19px;height:19px;stroke:#d8d8d8;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 20px}
+.header .icon{width:22px;height:22px;stroke:#eee}
+.header span{font-size:17px;font-weight:500;color:#fff}
+.group-label{font-size:12px;color:#999;padding:0 4px 8px;letter-spacing:.03em}
+.group-card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid rgba(255,255,255,0.08)}
+.row:last-child{border-bottom:none}
+.row-left{display:flex;align-items:center;gap:12px}
+.row-left .title{font-size:14px;color:#eee;display:flex;align-items:center;gap:6px}
+.row-left .sub{font-size:11px;color:#8f8f8f;margin-top:2px}
+.current-tag{font-size:10px;color:var(--accent-check);background:rgba(27,77,46,0.35);border:0.5px solid var(--accent);border-radius:10px;padding:1px 7px}
+.logout{font-size:12px;color:#c96a6a;cursor:pointer;background:none;border:none}
+.empty{font-size:12px;color:#7a7a7a;padding:16px;text-align:center}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Appareils connectés</span></div>
+
+<div class="group-label">cet appareil</div>
+<div class="group-card">
+  <div class="row" style="border-bottom:none;">
+    <div class="row-left">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      <div><div class="title">iPhone 14 <span class="current-tag">Actuel</span></div><div class="sub">Paris, France · Actif maintenant</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="group-label">autres appareils</div>
+<div class="group-card" id="device-list"></div>
+
+<script>
+/* ============================================================
+   BACKEND À BRANCHER :
+   - Remplacer DEVICES par GET /api/users/me/sessions (liste réelle
+     des sessions actives du compte, pas des exemples fixes).
+   - "Déconnecter" doit appeler DELETE /api/users/me/sessions/:id
+     pour vraiment terminer cette session côté serveur.
+   - Le comportement local ci-dessous (retirer de la liste après
+     déconnexion) montre déjà le principe UI attendu.
+   ============================================================ */
+
+const STORAGE_KEY = 'viewcoin_connected_devices';
+
+const DEFAULT_DEVICES = [
+  { id:"d1", icon: "laptop", name: "MacBook Pro", location: "Paris, France", last: "Actif il y a 2h" },
+  { id:"d2", icon: "smartphone", name: "Samsung Galaxy S23", location: "Lyon, France", last: "Actif il y a 3 jours" },
+  { id:"d3", icon: "tablet", name: "iPad Air", location: "Marseille, France", last: "Actif il y a 2 semaines" },
+];
+
+const ICONS = {
+  laptop: '<rect x="3" y="4" width="18" height="12" rx="1"/><line x1="2" y1="20" x2="22" y2="20"/>',
+  smartphone: '<rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+  tablet: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+};
+
+function loadDevices(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved ? JSON.parse(saved) : DEFAULT_DEVICES;
+}
+let devices = loadDevices();
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
+
+function render(){
+  const list = document.getElementById('device-list');
+  if (devices.length === 0){
+    list.innerHTML = '<div class="empty">Aucun autre appareil connecté</div>';
+    return;
+  }
+  list.innerHTML = '';
+  devices.forEach((d, i) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    if (i === devices.length - 1) row.style.borderBottom = 'none';
+    row.innerHTML = `
+      <div class="row-left">
+        <svg class="icon" viewBox="0 0 24 24">${ICONS[d.icon]}</svg>
+        <div><div class="title">${d.name}</div><div class="sub">${d.location} · ${d.last}</div></div>
+      </div>
+      <button class="logout" data-id="${d.id}">Déconnecter</button>
+    `;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('[data-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // TODO: DELETE /api/users/me/sessions/:id avant de retirer de la liste
+      devices = devices.filter(d => d.id !== btn.dataset.id);
+      save();
+      render();
+    });
+  });
+}
+render();
+</script>
+</body></html>

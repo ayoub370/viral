@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Adresse email</title>
+<style>
+:root{--bg:#000;--card:rgba(120,120,120,0.14);--card-border:rgba(255,255,255,0.12);--accent:#1b4d2e;--accent-dot:#eafbf0;--accent-check:#3ddc84;}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto}
+.icon{width:18px;height:18px;stroke:#d8d8d8;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 20px}
+.header .icon{width:22px;height:22px;stroke:#eee}
+.header span{font-size:17px;font-weight:500;color:#fff}
+.email-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;padding:14px 16px;margin-bottom:8px}
+.email-row .left{display:flex;align-items:center;gap:12px}
+.email-row .left span{font-size:14px;color:#fff}
+.badge{display:flex;align-items:center;gap:4px;border-radius:20px;padding:4px 9px}
+.badge.ok{background:rgba(27,77,46,0.35);border:0.5px solid var(--accent)}
+.badge.ko{background:rgba(200,80,80,0.2);border:0.5px solid #c85050}
+.badge svg{width:13px;height:13px}
+.badge.ok svg{stroke:var(--accent-check)}
+.badge.ko svg{stroke:#e08080}
+.badge span{font-size:11px}
+.badge.ok span{color:var(--accent-check)}
+.badge.ko span{color:#e08080}
+.helper{font-size:11px;color:#7a7a7a;padding:0 6px 22px;line-height:1.4}
+.group-label{font-size:12px;color:#999;padding:0 4px 8px;letter-spacing:.03em}
+.group-card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:22px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid rgba(255,255,255,0.08)}
+.row:last-child{border-bottom:none}
+.row-left{display:flex;align-items:center;gap:12px}
+.row-left .title{font-size:14px;color:#eee}
+.row-left .sub{font-size:11px;color:#8f8f8f;margin-top:2px}
+.status-ok{color:var(--accent-check);font-size:12px;cursor:pointer}
+.status-muted{color:#7a7a7a;font-size:12px;cursor:pointer}
+.switch{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:rgba(255,255,255,0.12);border-radius:26px;transition:.2s}
+.knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#cfcfcf;border-radius:50%;transition:.2s}
+.switch input:checked+.slider{background:var(--accent)}
+.switch input:checked+.slider+.knob{left:23px;background:var(--accent-dot)}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Adresse email</span></div>
+
+<div class="email-row">
+  <div class="left">
+    <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg>
+    <span id="user-email"></span>
+  </div>
+  <div class="badge" id="verif-badge"></div>
+</div>
+<div class="helper" id="verif-helper"></div>
+
+<div class="group-label">recherche &amp; confidentialité</div>
+<div class="group-card">
+  <div class="row">
+    <div class="row-left">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+      <div><div class="title">Autoriser à me trouver via cet email</div><div class="sub">Pour les invitations de contacts</div></div>
+    </div>
+    <label class="switch"><input type="checkbox" data-id="findable"><span class="slider"></span><span class="knob"></span></label>
+  </div>
+</div>
+
+<div class="group-label">sécurité &amp; récupération</div>
+<div class="group-card">
+  <div class="row">
+    <div class="row-left">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <span class="title">Email de récupération du compte</span>
+    </div>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#3ddc84" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="row">
+    <div class="row-left">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="16" r="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div><div class="title">Code de vérification par email</div><div class="sub">À la connexion depuis un nouvel appareil</div></div>
+    </div>
+    <label class="switch"><input type="checkbox" data-id="emailCode"><span class="slider"></span><span class="knob"></span></label>
+  </div>
+  <div class="row">
+    <div class="row-left">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div><div class="title">Alerte de connexion suspecte</div><div class="sub">Email si connexion depuis un lieu inhabituel</div></div>
+    </div>
+    <label class="switch"><input type="checkbox" data-id="suspiciousAlert"><span class="slider"></span><span class="knob"></span></label>
+  </div>
+</div>
+
+<div class="group-label">comptes liés</div>
+<div class="group-card" style="margin-bottom:0;" id="linked-accounts"></div>
+
+<script>
+/* ============================================================
+   BACKEND À BRANCHER :
+   - #user-email / badge vérifié : remplacer USER_PROFILE par un
+     vrai GET /api/users/me (email réel + statut de vérification réel).
+   - Les toggles findable / emailCode / suspiciousAlert : GET/PUT
+     /api/users/me/security-settings au lieu de localStorage.
+   - #linked-accounts : GET /api/users/me/linked-accounts pour l'état
+     réel des connexions OAuth, et lancer le vrai flux OAuth au clic
+     sur "Connecter" (au lieu du toggle local ci-dessous).
+   ============================================================ */
+
+const STORAGE_KEY = 'viewcoin_email_settings';
+
+// Simule le compte connecté — À REMPLACER par le vrai profil utilisateur
+const USER_PROFILE = { email: "ayoub.d****@gmail.com", verified: true, verifiedSince: "il y a 3 mois" };
+
+function loadState(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) return JSON.parse(saved);
+  return { findable:false, emailCode:true, suspiciousAlert:true, google:true, apple:false };
+}
+let state = loadState();
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+document.getElementById('user-email').textContent = USER_PROFILE.email;
+const badge = document.getElementById('verif-badge');
+const helper = document.getElementById('verif-helper');
+if (USER_PROFILE.verified){
+  badge.className = 'badge ok';
+  badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Vérifié</span>';
+  helper.textContent = `Vérifié ${USER_PROFILE.verifiedSince}. Un email de sécurité a été envoyé à cette adresse.`;
+} else {
+  badge.className = 'badge ko';
+  badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Non vérifié</span>';
+  helper.textContent = "Vérifiez votre email pour sécuriser votre compte.";
+}
+
+document.querySelectorAll('input[data-id]').forEach(input => {
+  input.checked = state[input.dataset.id];
+  input.addEventListener('change', () => { state[input.dataset.id] = input.checked; save(); });
+});
+
+function renderLinked(){
+  const container = document.getElementById('linked-accounts');
+  container.innerHTML = `
+    <div class="row">
+      <div class="row-left">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21.35 11.1H12v2.9h5.35c-.5 2.5-2.6 4.2-5.35 4.2-3.2 0-5.8-2.6-5.8-5.8s2.6-5.8 5.8-5.8c1.5 0 2.8.55 3.85 1.5l2.2-2.2A9 9 0 1 0 12 21c4.9 0 9-3.5 9-9 0-.6-.05-1.2-.15-1.9z"/></svg>
+        <span class="title">Google</span>
+      </div>
+      <span class="${state.google ? 'status-ok' : 'status-muted'}" data-linked="google">${state.google ? 'Connecté' : 'Connecter'}</span>
+    </div>
+    <div class="row" style="border-bottom:none;">
+      <div class="row-left">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M16.5 3c.2 1.2-.3 2.4-1 3.2-.8.9-2 1.6-3.2 1.5-.2-1.1.4-2.3 1-3 .8-.9 2.1-1.6 3.2-1.7zM20 17.3c-.6 1.3-.9 1.9-1.6 3-1 1.6-2.5 3.6-4.3 3.6-1.6 0-2-.9-4.1-.9-2.1 0-2.6.9-4.1.9-1.8 0-3.2-1.8-4.2-3.4C-1 16.6-1.3 11 1.8 8.1c1.5-1.4 3.1-1.6 4.5-1.6 1.6 0 3 1 4.1 1 1 0 2.9-1.2 4.9-1 .8 0 3.1.3 4.6 2.5-.1.1-2.7 1.6-2.7 4.8 0 3.8 3.3 5.1 3.3 5.1z"/></svg>
+        <span class="title">Apple</span>
+      </div>
+      <span class="${state.apple ? 'status-ok' : 'status-muted'}" data-linked="apple">${state.apple ? 'Connecté' : 'Connecter'}</span>
+    </div>
+  `;
+  container.querySelectorAll('[data-linked]').forEach(el => {
+    el.addEventListener('click', () => {
+      const key = el.dataset.linked;
+      // TODO: remplacer par le vrai flux OAuth (Google/Apple Sign-In)
+      state[key] = !state[key];
+      save();
+      renderLinked();
+    });
+  });
+}
+renderLinked();
+</script>
+</body></html>

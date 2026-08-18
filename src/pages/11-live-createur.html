@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Live (créateur)</title>
+<style>
+:root{--accent:#1b4d2e;--accent-dot:#eafbf0;}
+*{box-sizing:border-box}
+body{margin:0;background:#000;font-family:-apple-system,Segoe UI,Roboto,sans-serif;}
+#live-screen{
+  background:linear-gradient(180deg,#1a1225 0%,#0a0710 60%,#000 100%);
+  max-width:420px;margin:0 auto;position:relative;height:100vh;overflow:hidden;
+}
+.icon{stroke:#eee;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.top-bar{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;z-index:3}
+.top-left{display:flex;align-items:center;gap:8px}
+.live-badge{background:#ff2d4a;color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;letter-spacing:.03em}
+.pill{background:rgba(20,20,20,0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;padding:5px 10px;font-size:11px;color:#eee;display:flex;align-items:center;gap:4px}
+.end-btn{background:rgba(255,45,74,0.9);color:#fff;font-size:12px;font-weight:600;border:none;border-radius:20px;padding:6px 14px;cursor:pointer}
+
+.earnings{position:absolute;top:58px;left:14px;z-index:2;background:rgba(27,77,46,0.35);border:0.5px solid var(--accent);border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:13px;color:#eafbf0;font-weight:600}
+.follower-toast{position:absolute;top:112px;left:14px;z-index:2;display:flex;align-items:center;gap:6px;background:rgba(20,20,20,0.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:20px;padding:5px 10px 5px 5px;font-size:11px;color:#eee}
+.follower-toast img{width:22px;height:22px;border-radius:50%}
+.gift-alert{position:absolute;top:190px;left:50%;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(255,183,3,0.25),rgba(255,77,109,0.25));border:0.5px solid rgba(255,183,3,0.4);border-radius:18px;padding:6px 14px;font-size:12px;color:#fff}
+
+.side-actions{position:absolute;right:12px;bottom:160px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:2}
+.side-action{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer}
+.side-action .circle{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center}
+.side-action span{font-size:10px;color:#eee}
+
+.chat{position:absolute;bottom:74px;left:14px;right:80px;z-index:2;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-height:140px;overflow:hidden}
+.chat-msg{font-size:12px;color:#e6e6e6;background:rgba(20,20,20,0.3);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:10px;padding:4px 8px;align-self:flex-start}
+
+.bottom-bar{position:absolute;bottom:14px;left:14px;right:14px;z-index:3;display:flex;align-items:center;gap:10px}
+.reply-input{flex:1;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:none;outline:none;border-radius:22px;padding:9px 16px;font-size:13px;color:#fff}
+.reply-input::placeholder{color:#c9c9c9}
+.round-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:none;cursor:pointer}
+.round-btn.muted{background:rgba(255,45,74,0.35)}
+</style></head><body>
+
+<div id="live-screen">
+
+  <div class="top-bar">
+    <div class="top-left">
+      <div class="live-badge">LIVE</div>
+      <!-- viewerCount doit venir du flux temps réel du live -->
+      <div class="pill" id="viewer-count">
+        <svg class="icon" width="12" height="12" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        3.2k
+      </div>
+      <!-- Chrono réel démarré au lancement du live, pas une valeur figée -->
+      <div class="pill" id="duration" style="color:#eafbf0;">⏱ 00:00</div>
+    </div>
+    <button class="end-btn" id="end-live-btn">Terminer</button>
+  </div>
+
+  <!-- Gains réels, mis à jour à chaque cadeau reçu -->
+  <div class="earnings" id="earnings">
+    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" stroke="#3ddc84"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg>
+    <span id="earnings-count">0 pièce gagnée</span>
+  </div>
+
+  <!-- Toast follower : doit apparaître à chaque vrai événement "nouveau follower" -->
+  <div class="follower-toast" id="follower-toast" style="display:none;">
+    <img src="https://i.pravatar.cc/40?img=15" alt="">
+    <span id="follower-name">Khalid vient de vous suivre</span>
+  </div>
+
+  <!-- Alerte cadeau : doit apparaître à chaque vrai événement "gift" -->
+  <div class="gift-alert" id="gift-alert" style="display:none;">
+    <span>🎁</span><span id="gift-text">GamerPro : Rose x10</span>
+  </div>
+
+  <div class="side-actions">
+    <button class="side-action" id="invite-btn">
+      <div class="circle"><svg class="icon" width="19" height="19" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
+      <span>Inviter</span>
+    </button>
+    <button class="side-action" id="effects-btn">
+      <div class="circle"><svg class="icon" width="19" height="19" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></div>
+      <span>Effets</span>
+    </button>
+    <button class="side-action" id="more-btn">
+      <div class="circle"><svg class="icon" width="19" height="19" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+      <span>Plus</span>
+    </button>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="bottom-bar">
+    <input class="reply-input" id="reply-input" placeholder="Répondre au chat..." type="text">
+    <button class="round-btn" id="mic-btn">
+      <svg class="icon" width="17" height="17" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+    </button>
+    <button class="round-btn" id="camera-flip-btn">
+      <svg class="icon" width="17" height="17" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   LOGIQUE À IMPLÉMENTER (pas de valeur codée en dur en prod) :
+
+   1. CHRONO (#duration)
+      - Démarrer un vrai chronomètre à l'instant du lancement du
+        live, mis à jour chaque seconde tant que le live est actif.
+
+   2. SPECTATEURS & GAINS (#viewer-count, #earnings-count)
+      - Doivent se mettre à jour en temps réel via le flux du live
+        (viewers qui rejoignent/quittent, cadeaux reçus).
+
+   3. NOTIFICATIONS DYNAMIQUES (#follower-toast, #gift-alert)
+      - Ne doivent s'afficher (display:block puis disparaître après
+        quelques secondes) qu'en réaction à un vrai événement reçu
+        du serveur (nouveau follower / cadeau envoyé), jamais
+        affichées en permanence.
+
+   4. INVITER (#invite-btn)
+      - Doit ouvrir une vraie recherche pour ajouter un co-hôte
+        au live (multi-stream réel), pas juste un bouton visuel.
+
+   5. MICRO (#mic-btn) / CAMÉRA (#camera-flip-btn)
+      - Doivent réellement couper/activer l'audio du flux et
+        basculer caméra avant/arrière du device.
+
+   6. CHAT (#chat + #reply-input)
+      - #chat reçoit les messages réels des spectateurs en direct.
+      - #reply-input envoie un vrai message au chat du live.
+
+   7. TERMINER (#end-live-btn)
+      - Doit réellement arrêter la diffusion, déconnecter tous les
+        spectateurs, et sauvegarder les stats finales (durée,
+        spectateurs, gains) dans l'historique du créateur.
+   ============================================================ */
+
+// Exemple de chrono (à remplacer par le vrai timestamp de démarrage du live)
+let seconds = 0;
+setInterval(() => {
+  seconds++;
+  const m = String(Math.floor(seconds/60)).padStart(2,'0');
+  const s = String(seconds%60).padStart(2,'0');
+  document.getElementById('duration').textContent = `⏱ ${m}:${s}`;
+}, 1000);
+
+document.getElementById('reply-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    // TODO: envoyer e.target.value au chat temps réel du live
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg';
+    msg.innerHTML = `<b style="color:#3ddc84;">Vous:</b> ${e.target.value}`;
+    document.getElementById('chat').appendChild(msg);
+    e.target.value = '';
+  }
+});
+
+document.getElementById('mic-btn').addEventListener('click', (e) => {
+  // TODO: couper/activer réellement le micro du flux
+  e.currentTarget.classList.toggle('muted');
+});
+
+document.getElementById('camera-flip-btn').addEventListener('click', () => {
+  // TODO: basculer réellement caméra avant/arrière
+  console.log('flip caméra');
+});
+
+document.getElementById('invite-btn').addEventListener('click', () => {
+  // TODO: ouvrir la recherche de co-hôte réelle
+  console.log('inviter un co-hôte');
+});
+
+document.getElementById('end-live-btn').addEventListener('click', () => {
+  // TODO: arrêter la diffusion, déconnecter les spectateurs,
+  // sauvegarder les stats finales dans l'historique du créateur
+  console.log('terminer le live');
+});
+</script>
+</body></html>

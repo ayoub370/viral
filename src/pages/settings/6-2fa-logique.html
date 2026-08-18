@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Double authentification</title>
+<style>
+:root{--bg:#000;--card:rgba(120,120,120,0.14);--card-border:rgba(255,255,255,0.12);--accent:#1b4d2e;--accent-dot:#eafbf0;--accent-check:#3ddc84;}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto}
+.icon{width:18px;height:18px;stroke:#d8d8d8;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 20px}
+.header .icon{width:22px;height:22px;stroke:#eee}
+.header span{font-size:17px;font-weight:500;color:#fff}
+.status-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid rgba(27,77,46,0.5);border-radius:16px;padding:14px 16px;margin-bottom:6px}
+.status-row .left{display:flex;align-items:center;gap:12px}
+.status-row .left svg{width:20px;height:20px;stroke:var(--accent-check)}
+.status-row .title{font-size:14px;color:#fff;font-weight:500}
+.status-row .sub{font-size:11px;color:#9a9a9a;margin-top:2px}
+.helper{font-size:11px;color:#7a7a7a;padding:0 6px 22px;line-height:1.4}
+.group-label{font-size:12px;color:#999;padding:0 4px 8px;letter-spacing:.03em}
+.group-card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:22px}
+.group-card.disabled{opacity:0.4;pointer-events:none}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid rgba(255,255,255,0.08);cursor:pointer}
+.row:last-child{border-bottom:none}
+.row-left{display:flex;align-items:center;gap:12px}
+.row-left .title{font-size:14px;color:#eee}
+.row-left .sub{font-size:11px;color:#8f8f8f;margin-top:2px}
+.radio{width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);flex-shrink:0}
+.radio.selected{border-color:var(--accent-check);display:flex;align-items:center;justify-content:center}
+.radio.selected .dot-inner{width:9px;height:9px;border-radius:50%;background:var(--accent-check)}
+.switch{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:rgba(255,255,255,0.12);border-radius:26px;transition:.2s}
+.knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#cfcfcf;border-radius:50%;transition:.2s}
+.switch input:checked+.slider{background:var(--accent)}
+.switch input:checked+.slider+.knob{left:23px;background:var(--accent-dot)}
+.warning{display:flex;align-items:flex-start;gap:8px;padding:2px 6px 0}
+.warning svg{width:14px;height:14px;stroke:#c98a3a;margin-top:1px}
+.warning span{font-size:12px;color:#9a9a9a;line-height:1.5}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Double authentification</span></div>
+
+<div class="status-row">
+  <div class="left">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><polyline points="9 12 11 14 15 10"/></svg>
+    <div><div class="title">2FA activée</div><div class="sub" id="status-sub">Votre compte est mieux protégé</div></div>
+  </div>
+  <label class="switch"><input type="checkbox" id="master-2fa"><span class="slider"></span><span class="knob"></span></label>
+</div>
+<div class="helper">Un code sera demandé en plus du mot de passe à chaque nouvelle connexion.</div>
+
+<div class="group-label">méthode de vérification</div>
+<div class="group-card" id="method-list"></div>
+
+<div class="group-label">secours</div>
+<div class="group-card" style="margin-bottom:12px;">
+  <div class="row" style="border-bottom:none;">
+    <div class="row-left">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L20 3"/><path d="M17 6l3 3"/><path d="M14 9l2 2"/></svg>
+      <div><div class="title">Codes de secours</div><div class="sub" id="backup-codes-count"></div></div>
+    </div>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7a7a7a" stroke-width="1.8"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+</div>
+
+<div class="warning">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <span>Conservez vos codes de secours en lieu sûr si vous perdez l'accès à votre méthode principale.</span>
+</div>
+
+<script>
+/* ============================================================
+   BACKEND À BRANCHER :
+   - master-2fa : PUT /api/users/me/2fa { enabled: true/false }
+     réel — active/désactive vraiment la 2FA côté serveur.
+   - Méthode sélectionnée : PUT /api/users/me/2fa/method réel.
+   - user.phone / user.email : GET /api/users/me réel (jamais de
+     valeur fixe — le numéro doit être celui du compte, masqué).
+   - Codes de secours : GET /api/users/me/2fa/backup-codes pour
+     le vrai compteur restant.
+   ============================================================ */
+
+const STORAGE_KEY = 'viewcoin_2fa_settings';
+
+// Simule le compte connecté — À REMPLACER par le vrai profil utilisateur
+const USER = { phone: "•• •• •• 82 47", email: "ayoub.****@gmail.com" };
+
+function loadState(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) return JSON.parse(saved);
+  return { enabled:true, method:'app', backupCodesLeft:8, backupCodesTotal:10 };
+}
+let state = loadState();
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+const METHODS = [
+  { id:'app', title:"Application d'authentification", sub:"Google Authenticator, Authy...",
+    icon:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>' },
+  { id:'sms', title:"SMS", sub:USER.phone,
+    icon:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
+  { id:'email', title:"Email", sub:USER.email,
+    icon:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/>' },
+];
+
+function render(){
+  document.getElementById('master-2fa').checked = state.enabled;
+  document.getElementById('status-sub').textContent = state.enabled ? "Votre compte est mieux protégé" : "Votre compte est moins protégé";
+
+  const methodList = document.getElementById('method-list');
+  methodList.className = 'group-card' + (state.enabled ? '' : ' disabled');
+  methodList.innerHTML = '';
+  METHODS.forEach(m => {
+    const selected = state.method === m.id;
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="row-left">
+        <svg class="icon" viewBox="0 0 24 24">${m.icon}</svg>
+        <div><div class="title">${m.title}</div><div class="sub">${m.sub}</div></div>
+      </div>
+      <div class="radio ${selected?'selected':''}">${selected?'<div class="dot-inner"></div>':''}</div>
+    `;
+    row.addEventListener('click', () => { state.method = m.id; save(); render(); });
+    methodList.appendChild(row);
+  });
+
+  document.getElementById('backup-codes-count').textContent =
+    `${state.backupCodesLeft} codes restants sur ${state.backupCodesTotal}`;
+}
+
+document.getElementById('master-2fa').addEventListener('change', (e) => {
+  state.enabled = e.target.checked;
+  save();
+  render();
+});
+
+render();
+</script>
+</body></html>

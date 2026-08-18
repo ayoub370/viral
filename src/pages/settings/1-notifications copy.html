@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Notifications</title>
+<style>
+:root{--bg:#000;--card:rgba(120,120,120,0.14);--card-border:rgba(255,255,255,0.12);--accent:#1b4d2e;--accent-dot:#eafbf0;}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto}
+.icon{width:18px;height:18px;stroke:#d8d8d8;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 18px}
+.header .icon{width:22px;height:22px;stroke:#eee}
+.header span{font-size:17px;font-weight:500;color:#fff}
+.master-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;padding:14px 16px;margin-bottom:20px}
+.master-row .title{font-size:14px;color:#fff;font-weight:500}
+.master-row .sub{font-size:12px;color:#9a9a9a;margin-top:2px}
+.group-label{font-size:12px;color:#999;padding:0 4px 8px;letter-spacing:.03em}
+.group-card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:18px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid rgba(255,255,255,0.08)}
+.row:last-child{border-bottom:none}
+.row-left{display:flex;align-items:center;gap:12px}
+.row-left span{font-size:14px;color:#eee}
+.switch{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:rgba(255,255,255,0.12);border-radius:26px;transition:.2s}
+.knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#cfcfcf;border-radius:50%;transition:.2s}
+.switch input:checked+.slider{background:var(--accent)}
+.switch input:checked+.slider+.knob{left:23px;background:var(--accent-dot)}
+button.save{width:100%;background:var(--accent);color:var(--accent-dot);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;margin-top:4px}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Notifications</span></div>
+
+<div class="master-row">
+  <div><div class="title">Tout activer</div><div class="sub">Coupe tous les rappels ci-dessous</div></div>
+  <label class="switch"><input type="checkbox" checked><span class="slider"></span><span class="knob"></span></label>
+</div>
+
+<div id="groups"></div>
+<button class="save">Enregistrer</button>
+
+<script>
+const ICON_PATHS = {
+  heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  at:'<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-5.5 8.3"/>',
+  userplus:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-3-3.87"/><path d="M7 21v-2a4 4 0 0 1 3-3.87"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  broadcast:'<path d="M4.9 19.1a9 9 0 1 1 14.2 0"/><path d="M7.8 16.2a5 5 0 1 1 8.4 0"/><circle cx="12" cy="14" r="1"/>',
+  video:'<rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/>',
+  trending:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  coin:'<circle cx="12" cy="12" r="9"/><path d="M9 12h6"/><path d="M12 9v6"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  gift:'<rect x="3" y="8" width="18" height="13" rx="1"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2 0-3-1-3-2.5S10 3 12 4c2-1 3 0 3 1.5S14 8 12 8z"/>',
+  shieldcheck:'<path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><polyline points="9 12 11 14 15 10"/>',
+  refresh:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>'
+};
+function iconSvg(key){return '<svg class="icon" viewBox="0 0 24 24">'+ICON_PATHS[key]+'</svg>';}
+
+const groups = [
+  {label:"interactions", items:[
+    {icon:"heart", title:"J'aime sur vos vidéos", on:true},
+    {icon:"message", title:"Commentaires", on:true},
+    {icon:"at", title:"Mentions", on:true},
+    {icon:"userplus", title:"Nouveaux abonnés", on:true},
+    {icon:"share", title:"Partages de votre contenu", on:false}]},
+  {label:"messages", items:[
+    {icon:"mail", title:"Messages privés", on:true},
+    {icon:"users", title:"Invitations de groupe", on:false}]},
+  {label:"lives & contenu", items:[
+    {icon:"broadcast", title:"Lives des créateurs suivis", on:true},
+    {icon:"video", title:"Nouvelles vidéos des abonnements", on:true},
+    {icon:"trending", title:"Contenu tendance pour vous", on:false}]},
+  {label:"récompenses (watch-to-earn)", items:[
+    {icon:"coin", title:"Récompenses gagnées", on:true},
+    {icon:"target", title:"Paliers et objectifs atteints", on:true},
+    {icon:"gift", title:"Offres et bonus limités", on:false}]},
+  {label:"système", items:[
+    {icon:"shieldcheck", title:"Sécurité du compte", on:true},
+    {icon:"refresh", title:"Mises à jour de l'application", on:false}]}
+];
+
+const container = document.getElementById('groups');
+groups.forEach(g => {
+  const section = document.createElement('div');
+  const label = document.createElement('div');
+  label.className = 'group-label'; label.textContent = g.label;
+  section.appendChild(label);
+  const card = document.createElement('div'); card.className = 'group-card';
+  g.items.forEach(item => {
+    const row = document.createElement('div'); row.className = 'row';
+    row.innerHTML = `<div class="row-left">${iconSvg(item.icon)}<span>${item.title}</span></div>
+      <label class="switch"><input type="checkbox" ${item.on?'checked':''}><span class="slider"></span><span class="knob"></span></label>`;
+    card.appendChild(row);
+  });
+  section.appendChild(card);
+  container.appendChild(section);
+});
+</script>
+</body></html>

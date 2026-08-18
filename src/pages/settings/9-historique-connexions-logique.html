@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Historique des connexions</title>
+<style>
+:root{--bg:#000;--card:rgba(120,120,120,0.14);--card-border:rgba(255,255,255,0.12);--accent-check:#3ddc84;}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto}
+.icon{width:19px;height:19px;stroke:#d8d8d8;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 20px}
+.header .icon{width:22px;height:22px;stroke:#eee}
+.header span{font-size:17px;font-weight:500;color:#fff}
+.group-label{font-size:12px;color:#999;padding:0 4px 8px;letter-spacing:.03em}
+.group-card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:0.5px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid rgba(255,255,255,0.08)}
+.row:last-child{border-bottom:none}
+.row-left{display:flex;align-items:center;gap:12px}
+.row-left .title{font-size:14px;color:#eee}
+.row-left .sub{font-size:11px;color:#8f8f8f;margin-top:2px}
+.status-ok{color:var(--accent-check);font-size:11px}
+.status-warn{color:#c98a3a;font-size:11px;cursor:pointer;text-decoration:underline}
+.loading{font-size:12px;color:#7a7a7a;padding:16px;text-align:center}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Historique des connexions</span></div>
+
+<div class="group-label">connexions récentes</div>
+<div class="group-card" id="history-list">
+  <div class="loading">Chargement...</div>
+</div>
+
+<script>
+/* ============================================================
+   BACKEND À BRANCHER :
+   - Remplacer fetchHistory() par un vrai GET /api/users/me/login-history
+     (logs réels du compte, pas les 4 exemples fixes).
+   - Le clic sur "Vérifier cette connexion" doit ouvrir un vrai flux
+     de confirmation (ex: "Était-ce vous ?" avec option de forcer
+     la déconnexion de cette session + changement de mot de passe).
+   - Le "loading" ci-dessous simule un appel réseau ; à remplacer
+     par le vrai état de chargement de la requête API.
+   ============================================================ */
+
+// Simule un appel API — À REMPLACER par un vrai fetch('/api/users/me/login-history')
+function fetchHistory(){
+  return new Promise(resolve => {
+    setTimeout(() => resolve([
+      { device: "iPhone 14", location: "Paris, France", date: "Aujourd'hui, 14:32", status: "ok" },
+      { device: "MacBook Pro", location: "Paris, France", date: "Hier, 09:10", status: "ok" },
+      { device: "Appareil inconnu", location: "Berlin, Allemagne", date: "12 juillet, 22:47", status: "warn" },
+      { device: "Samsung Galaxy S23", location: "Lyon, France", date: "8 juillet, 18:03", status: "ok" },
+    ]), 400);
+  });
+}
+
+const ICONS = {
+  ok: '<polyline points="20 6 9 17 4 12"/>',
+  warn: '<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86l-8.18 14.14A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3l-8.18-14.14a2 2 0 0 0-3.42 0z"/>',
+};
+
+fetchHistory().then(history => {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  history.forEach((h, i) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    if (i === history.length - 1) row.style.borderBottom = 'none';
+    const strokeColor = h.status === 'ok' ? '#3ddc84' : '#c98a3a';
+    row.innerHTML = `
+      <div class="row-left">
+        <svg class="icon" viewBox="0 0 24 24" style="stroke:${strokeColor}">${ICONS[h.status]}</svg>
+        <div><div class="title">${h.device}</div><div class="sub">${h.location} · ${h.date}</div></div>
+      </div>
+      ${h.status === 'ok'
+        ? '<span class="status-ok">Connexion réussie</span>'
+        : '<span class="status-warn" data-action="verify">Vérifier cette connexion</span>'}
+    `;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('[data-action="verify"]').forEach(el => {
+    el.addEventListener('click', () => {
+      // TODO: ouvrir le vrai flux "Était-ce vous ?" (confirmer/révoquer la session)
+      alert("Ouvrir la vérification de cette connexion (à connecter au backend).");
+    });
+  });
+});
+</script>
+</body></html>

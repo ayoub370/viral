@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Thème</title>
+<style>
+:root{
+  --accent:#1b4d2e;--accent-check:#3ddc84;
+  --bg:#000;--text-main:#fff;--text-sub:#eee;
+  --card-bg:#f2f2f2;--card-border:rgba(255,255,255,0.12);
+}
+/* Thème clair réel : ces variables changent TOUTE la page quand .theme-light est sur <body> */
+body.theme-light{
+  --bg:#fdfdfd;--text-main:#111;--text-sub:#333;--card-border:rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 16px;max-width:420px;margin:0 auto;transition:background .25s,color .25s;}
+.icon{width:22px;height:22px;stroke:var(--text-main);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px 22px}
+.header span{font-size:17px;font-weight:500;color:var(--text-main)}
+.options{display:flex;gap:14px}
+.option{flex:1;cursor:pointer}
+.preview{border-radius:16px;overflow:hidden;padding:12px;height:150px;display:flex;flex-direction:column;gap:8px}
+.preview.light{background:#f2f2f2;border:0.5px solid rgba(255,255,255,0.12)}
+.preview.dark{background:#0d0d0d;border:1px solid var(--accent)}
+.light .card{background:#fff;border:0.5px solid rgba(0,0,0,0.08)}
+.dark .card{background:rgba(120,120,120,0.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid rgba(255,255,255,0.12)}
+.card{border-radius:10px}
+.card.top{padding:8px;display:flex;align-items:center;gap:6px}
+.card.body{flex:1}
+.card.cta.light{background:#fff;height:24px;width:60%}
+.card.cta.dark{background:var(--accent);height:24px;width:60%;border:none}
+.dot{width:16px;height:16px;border-radius:50%}
+.light .dot{background:#ddd}
+.dark .dot{background:#3a3a3a}
+.bar{height:6px;width:60%;border-radius:4px}
+.light .bar{background:#ddd}
+.dark .bar{background:#3a3a3a}
+.label-row{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:12px}
+.radio{width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(150,150,150,0.5)}
+.radio.selected{border-color:var(--accent-check);display:flex;align-items:center;justify-content:center}
+.radio.selected .dot-inner{width:9px;height:9px;border-radius:50%;background:var(--accent-check)}
+.label-row span{font-size:14px;color:var(--text-sub)}
+.label-row span.selected-text{color:var(--text-main);font-weight:500}
+.note{font-size:12px;color:var(--text-sub);padding:24px 6px 0;line-height:1.5;text-align:center;opacity:0.6}
+</style></head><body>
+
+<div class="header"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Thème</span></div>
+
+<div class="options" id="theme-options">
+  <div class="option" data-theme="light">
+    <div class="preview light">
+      <div class="card top"><div class="dot"></div><div class="bar"></div></div>
+      <div class="card body"></div>
+      <div class="card cta light"></div>
+    </div>
+    <div class="label-row"><div class="radio"></div><span>Clair</span></div>
+  </div>
+  <div class="option" data-theme="dark">
+    <div class="preview dark">
+      <div class="card top"><div class="dot"></div><div class="bar"></div></div>
+      <div class="card body"></div>
+      <div class="card cta dark"></div>
+    </div>
+    <div class="label-row"><div class="radio"></div><span>Sombre</span></div>
+  </div>
+</div>
+
+<div class="note">Le thème s'applique immédiatement à toute l'application.</div>
+
+<script>
+/* ============================================================
+   BACKEND À BRANCHER :
+   - Remplacer STORAGE_KEY / localStorage par le vrai réglage
+     de thème du compte (ex: PUT /api/users/me { theme: 'light' }).
+   - IMPORTANT (déjà fonctionnel ici en démo) : le thème doit
+     s'appliquer à TOUTE l'application, pas qu'à cet écran.
+     Le principe : une classe globale (.theme-light) sur le
+     conteneur racine, et toutes les couleurs de l'app définies
+     en variables CSS qui changent avec cette classe — exactement
+     comme fait ici sur <body>. Dans React Native/Expo, l'équivalent
+     est un contexte de thème (ThemeProvider) lu par tous les écrans.
+   ============================================================ */
+
+const STORAGE_KEY = 'viewcoin_theme';
+
+function applyTheme(theme){
+  document.body.classList.toggle('theme-light', theme === 'light');
+  document.querySelectorAll('#theme-options .option').forEach(opt => {
+    const selected = opt.dataset.theme === theme;
+    const radio = opt.querySelector('.radio');
+    const label = opt.querySelector('.label-row span');
+    radio.classList.toggle('selected', selected);
+    radio.innerHTML = selected ? '<div class="dot-inner"></div>' : '';
+    label.classList.toggle('selected-text', selected);
+  });
+}
+
+function getCurrentTheme(){ return localStorage.getItem(STORAGE_KEY) || 'dark'; }
+
+document.querySelectorAll('#theme-options .option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const theme = opt.dataset.theme;
+    localStorage.setItem(STORAGE_KEY, theme);
+    applyTheme(theme);
+  });
+});
+
+applyTheme(getCurrentTheme());
+</script>
+</body></html>

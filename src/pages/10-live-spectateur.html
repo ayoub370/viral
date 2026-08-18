@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>ViewCoin – Live (spectateur)</title>
+<style>
+:root{--accent:#1b4d2e;--accent-dot:#eafbf0;}
+*{box-sizing:border-box}
+body{margin:0;background:#000;font-family:-apple-system,Segoe UI,Roboto,sans-serif;}
+#live-screen{
+  background:linear-gradient(180deg,#1a1225 0%,#0a0710 60%,#000 100%);
+  max-width:420px;margin:0 auto;position:relative;height:100vh;overflow:hidden;
+}
+.icon{stroke:#eee;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.top-bar{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;z-index:3}
+.creator-chip{display:flex;align-items:center;gap:8px;background:rgba(20,20,20,0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:24px;padding:4px 12px 4px 4px}
+.creator-chip img{width:32px;height:32px;border-radius:50%;border:1.5px solid #ff4d6d}
+.creator-name{font-size:12px;color:#fff;font-weight:600}
+.creator-status{font-size:10px;color:#ffb3c0}
+.follow-btn{background:var(--accent);color:var(--accent-dot);font-size:11px;font-weight:600;border:none;border-radius:14px;padding:4px 10px;margin-left:4px;cursor:pointer}
+.follow-btn.following{background:rgba(255,255,255,0.15);color:#eee}
+.close-btn{background:none;border:none;cursor:pointer;padding:0}
+
+.gift-banner{position:absolute;top:70px;left:14px;z-index:2;background:rgba(27,77,46,0.35);border:0.5px solid var(--accent);border-radius:14px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:11px;color:#eafbf0}
+
+#tap-zone{position:absolute;inset:0;z-index:1;cursor:pointer}
+
+.chat{position:absolute;bottom:70px;left:14px;right:80px;z-index:2;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-height:160px;overflow:hidden}
+.chat-msg{font-size:12px;color:#e6e6e6;background:rgba(20,20,20,0.3);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:10px;padding:4px 8px;align-self:flex-start}
+.chat-msg b{margin-right:2px}
+
+.bottom-bar{position:absolute;bottom:14px;left:14px;right:14px;z-index:3;display:flex;align-items:center;gap:10px}
+.comment-input{flex:1;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:none;outline:none;border-radius:22px;padding:9px 16px;font-size:13px;color:#fff}
+.comment-input::placeholder{color:#c9c9c9}
+.round-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:none;cursor:pointer}
+.gift-btn{background:linear-gradient(135deg,#ffb703,#ff4d6d)}
+</style></head><body>
+
+<div id="live-screen">
+
+  <div class="top-bar">
+    <div class="creator-chip">
+      <!-- L'avatar/nom/statut doivent venir des vraies données du live en cours (creatorId, live status, viewerCount) -->
+      <img src="https://i.pravatar.cc/40?img=32" alt="">
+      <div>
+        <div class="creator-name" id="creator-name">Lena Rivers</div>
+        <div class="creator-status" id="viewer-count">● En direct · 3.2k</div>
+      </div>
+      <button class="follow-btn" id="follow-btn">Suivre</button>
+    </div>
+    <button class="close-btn" id="close-btn">
+      <svg class="icon" width="20" height="20" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Bannière de cadeau : doit apparaître dynamiquement à chaque vrai événement "gift" reçu via le flux temps réel, pas être statique -->
+  <div class="gift-banner" id="gift-banner">
+    <span>🎁</span><span>GamerPro a envoyé 50 pièces</span>
+  </div>
+
+  <!-- Zone tapable : tout tap envoie un vrai like au serveur + joue l'animation de coeur en retour visuel -->
+  <div id="tap-zone"></div>
+
+  <!-- Chat : les messages doivent venir du flux temps réel du live (tous les spectateurs les voient), pas être codés en dur -->
+  <div class="chat" id="chat"></div>
+
+  <div class="bottom-bar">
+    <input class="comment-input" id="comment-input" placeholder="Dire quelque chose de gentil..." type="text">
+    <button class="round-btn" id="share-btn">
+      <svg class="icon" width="17" height="17" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+    </button>
+    <button class="round-btn gift-btn" id="open-gift-btn">
+      <span style="font-size:17px;">🎁</span>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   LOGIQUE À IMPLÉMENTER (pas de valeur codée en dur en prod) :
+
+   1. LIKES PAR TAP
+      - Chaque tap sur #tap-zone doit envoyer un like au serveur
+        (WebSocket ou API), lié au live actuellement affiché.
+      - Throttle : limiter à ~1 envoi toutes les 100-150ms pour
+        éviter le spam serveur si l'utilisateur tapote vite.
+      - L'animation de coeur est UNIQUEMENT le retour visuel,
+        pas l'action elle-même.
+
+   2. SUIVRE / NE PLUS SUIVRE
+      - #follow-btn doit appeler l'API follow/unfollow réelle
+        et refléter l'état réel (déjà abonné ou non) au chargement.
+
+   3. COMPTEUR SPECTATEURS (#viewer-count)
+      - Doit se mettre à jour en temps réel via le flux du live
+        (viewers qui rejoignent/quittent), pas rester figé.
+
+   4. CHAT (#chat + #comment-input)
+      - Envoyer un message doit le transmettre en temps réel à
+        TOUS les spectateurs du live (pas juste l'afficher localement).
+      - #chat doit recevoir les messages des autres spectateurs
+        et du créateur en direct.
+
+   5. CADEAUX (#gift-banner + #open-gift-btn)
+      - #open-gift-btn doit ouvrir un vrai sélecteur de cadeaux,
+        débiter le solde réel de l'utilisateur, créditer le créateur,
+        puis déclencher une bannière visible par tous les spectateurs.
+      - #gift-banner ne doit s'afficher qu'en réaction à un vrai
+        événement "gift" reçu du serveur.
+
+   6. PARTAGE (#share-btn)
+      - Doit ouvrir le menu de partage natif avec un lien direct
+        vers ce live précis.
+
+   7. FERMER (#close-btn)
+      - Doit déconnecter proprement le flux (quitter le live côté
+        serveur) avant de retourner à l'écran précédent.
+   ============================================================ */
+
+const zone = document.getElementById('tap-zone');
+const screen = document.getElementById('live-screen');
+const heartShapes = ['❤️','💚','💛','💙'];
+
+zone.addEventListener('click', (e) => {
+  const rect = screen.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // TODO: envoyer le like réel au serveur ici (throttle)
+  // sendLike(currentLiveId);
+
+  const heart = document.createElement('div');
+  heart.textContent = heartShapes[Math.floor(Math.random()*heartShapes.length)];
+  heart.style.cssText = `
+    position:absolute; left:${x-12}px; top:${y-12}px; font-size:26px;
+    z-index:5; pointer-events:none; opacity:1;
+    transform:translateY(0) scale(1);
+    transition: transform 1.1s ease-out, opacity 1.1s ease-out;
+  `;
+  screen.appendChild(heart);
+  requestAnimationFrame(() => {
+    heart.style.transform = `translateY(-140px) translateX(${(Math.random()*40-20)}px) scale(1.4)`;
+    heart.style.opacity = '0';
+  });
+  setTimeout(() => heart.remove(), 1150);
+});
+
+document.getElementById('follow-btn').addEventListener('click', (e) => {
+  // TODO: appeler l'API follow/unfollow réelle
+  e.target.classList.toggle('following');
+  e.target.textContent = e.target.classList.contains('following') ? 'Abonné' : 'Suivre';
+});
+
+document.getElementById('comment-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    // TODO: envoyer e.target.value au chat temps réel du live
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg';
+    msg.innerHTML = `<b style="color:#7dd3fc;">Vous:</b> ${e.target.value}`;
+    document.getElementById('chat').appendChild(msg);
+    e.target.value = '';
+  }
+});
+
+document.getElementById('close-btn').addEventListener('click', () => {
+  // TODO: déconnecter proprement du flux live avant de fermer
+  console.log('quitter le live');
+});
+
+document.getElementById('share-btn').addEventListener('click', () => {
+  // TODO: ouvrir le partage natif avec le lien du live
+  console.log('partager le live');
+});
+
+document.getElementById('open-gift-btn').addEventListener('click', () => {
+  // TODO: ouvrir le vrai sélecteur de cadeaux
+  console.log('ouvrir sélecteur de cadeaux');
+});
+</script>
+</body></html>
