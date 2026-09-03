@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import LiveCreator from './LiveCreator';
 import VideoEditor from './VideoEditor';
+import VideoStudio from './VideoStudio';
 
 interface CameraPageProps {
   onBack: () => void;
@@ -46,6 +47,7 @@ const CameraPage: React.FC<CameraPageProps> = ({ onBack, userId, username, profi
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [duration, setDuration] = useState('15s');
   const [showEditor, setShowEditor] = useState(false);
+  const [showStudio, setShowStudio] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -108,7 +110,16 @@ const CameraPage: React.FC<CameraPageProps> = ({ onBack, userId, username, profi
   }
 
   if (showEditor) {
-    return <VideoEditor onBack={() => setShowEditor(false)} onNext={onBack} />;
+    return (
+      <>
+        <VideoEditor
+          onBack={() => setShowEditor(false)}
+          onNext={onBack}
+          onOpenStudio={() => setShowStudio(true)}
+        />
+        {showStudio && <VideoStudio onBack={() => setShowStudio(false)} />}
+      </>
+    );
   }
 
   const tools = [
