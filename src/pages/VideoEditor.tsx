@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ChevronLeft,
   Scissors,
@@ -11,10 +11,13 @@ import {
   Play,
   ChevronDown,
 } from 'lucide-react';
+import { ExportSheet } from '../components/editor/Sheets';
+import { SaveAsModal, ProgressModal, ExportDoneModal } from '../components/editor/Modals';
 
 interface VideoEditorProps {
   onBack: () => void;
   onNext?: () => void;
+  onOpenStudio?: () => void;
   previewUrl?: string;
 }
 
@@ -28,11 +31,37 @@ const editTools = [
   { icon: Volume2, label: 'Volume' },
 ];
 
-const glass =
-  'bg-white/10 border border-white/15 backdrop-blur-xl text-white';
+const glass = 'bg-white/10 border border-white/15 backdrop-blur-xl text-white';
 
-const VideoEditor: React.FC<VideoEditorProps> = ({ onBack, onNext, previewUrl }) => {
+const VideoEditor: React.FC<VideoEditorProps> = ({
+  onBack,
+  onNext,
+  onOpenStudio,
+  previewUrl,
+}) => {
   const [active, setActive] = useState('Trim');
+  const [exportOpen, setExportOpen] = useState(false);
+  const [saveAs, setSaveAs] = useState(false);
+  const [progressModal, setProgressModal] = useState(false);
+  const [exportValue, setExportValue] = useState(0);
+  const [doneOpen, setDoneOpen] = useState(false);
+  const [fileName, setFileName] = useState('clip_1');
+
+  useEffect(() => {
+    if (!progressModal) return;
+    const id = setInterval(() => {
+      setExportValue((v) => {
+        if (v >= 100) {
+          clearInterval(id);
+          setProgressModal(false);
+          setDoneOpen(true);
+          return 100;
+        }
+        return Math.min(100, v + 5);
+      });
+    }, 160);
+    return () => clearInterval(id);
+  }, [progressModal]);
 
   return (
     <div className="fixed inset-0 z-[2000] bg-[#010100] text-white">
@@ -50,7 +79,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ onBack, onNext, previewUrl })
           </button>
           <h1 className="truncate text-center text-sm font-semibold">Éditeur</h1>
           <button
-            onClick={onNext}
+            onClick={() => setExportOpen(true)}
             className={`${glass} shrink-0 rounded-full px-4 py-2 text-xs font-semibold`}
           >
             Suivant
@@ -59,7 +88,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ onBack, onNext, previewUrl })
 
         {/* Preview */}
         <div className="relative z-10 mt-4 flex-1 px-4">
-          <div className={`${glass} flex h-full min-h-[360px] items-center justify-center overflow-hidden rounded-3xl`}>
+          <div
+            className={`${glass} flex h-full min-h-[320px] items-center justify-center overflow-hidden rounded-3xl`}
+          >
             {previewUrl ? (
               <video src={previewUrl} controls playsInline className="h-full w-full object-cover" />
             ) : (
@@ -77,7 +108,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ onBack, onNext, previewUrl })
             {editTools.map(({ icon: Icon, label }) => (
               <button
                 key={label}
-                onClick={() => setActive(label)}
+                onClick={() => (label === 'Trim' ? onOpenStudio?.() : setActive(label))}
                 className="group flex w-14 shrink-0 flex-col items-center gap-1"
               >
                 <span
@@ -97,15 +128,56 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ onBack, onNext, previewUrl })
           </div>
         </div>
 
-        {/* Timeline */}
+        {/* Timeline -> grand éditeur */}
         <div className="relative z-10 px-4 pb-10 pt-5">
-          <div className={`${glass} flex items-center gap-1 overflow-x-auto rounded-2xl p-2`}>
+          <button
+            onClick={() => onOpenStudio?.()}
+            aria-label="Ouvrir le studio de montage"
+            className={`${glass} flex w-full items-center gap-1 overflow-x-auto rounded-2xl p-2`}
+          >
             {Array.from({ length: 8 }).map((_, i) => (
               <span key={i} className="h-12 w-10 shrink-0 rounded-md bg-white/15" aria-hidden />
             ))}
-          </div>
-          <p className="mt-3 text-center text-[11px] opacity-60">Glisse pour découper — {active}</p>
+            <span className="ml-1 flex h-12 w-10 shrink-0 items-center justify-center rounded-md bg-[#CB4762]">
+              <Scissors className="h-4 w-4" />
+            </span>
+          </button>
+          <p className="mt-3 text-center text-[11px] opacity-60">
+            Touche le ciseau pour ouvrir le studio — {active}
+          </p>
         </div>
+
+        <ExportSheet
+          open={exportOpen}
+          onClose={() => setExportOpen(false)}
+          onExport={() => {
+            setExportOpen(false);
+            setSaveAs(true);
+          }}
+        />
+        <SaveAsModal
+          open={saveAs}
+          onCancel={() => setSaveAs(false)}
+          onOk={(name) => {
+            setFileName(name);
+            setSaveAs(false);
+            setExportValue(0);
+            setProgressModal(true);
+          }}
+        />
+        <ProgressModal
+          open={progressModal}
+          value={exportValue}
+          onCancel={() => setProgressModal(false)}
+        />
+        <ExportDoneModal
+          open={doneOpen}
+          fileName={fileName}
+          onClose={() => {
+            setDoneOpen(false);
+            onNext?.();
+          }}
+        />
       </div>
     </div>
   );
