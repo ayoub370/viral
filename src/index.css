@@ -283,3 +283,43 @@ html {
     font-size: 14px;
   }
 }
+
+
+/* ================= Studio vidéo (glassmorphisme) ================= */
+:root {
+  --studio-cyan: #08f1ed;
+  --studio-blue: #3994f5;
+  --studio-violet: #a06efb;
+  --studio-magenta: #d946ef;
+  --studio-audio: #f59e0b;
+  --record: #cb4762;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: #fff;
+}
+
+.glass-tile {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: #fff;
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: #fff;
+}
+
+.btn-gradient {
+  background: linear-gradient(90deg, #08f1ed, #3994f5);
+  color: #001018;
+}
