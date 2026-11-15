@@ -1,0 +1,23 @@
+[functions.complete-signup]
+verify_jwt = false
+
+[functions.complete-login]
+verify_jwt = false
+
+[functions.send-otp]
+verify_jwt = false
+
+[functions.stripe-connect]
+verify_jwt = true
+
+[functions.stripe-payout]
+verify_jwt = true
+
+[functions.livekit-token]
+verify_jwt = true
+
+[functions.exoclick-stats]
+verify_jwt = false
+
+[functions.video-feed]
+verify_jwt = false

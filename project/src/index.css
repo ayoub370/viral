@@ -1,0 +1,424 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== DARK THEME (default) ==================== */
+:root {
+  --page-bg: #000000;
+  --card-bg: #0d0d0d;
+  --card-border: #1a1a1a;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(16px);
+  --glass-border: 0.5px solid rgba(255, 255, 255, 0.08);
+  --glass-border-accent: 0.5px solid rgba(255, 255, 255, 0.12);
+  --divider-border: 0.5px solid rgba(255, 255, 255, 0.06);
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #999999;
+  --text-muted: #777777;
+  --text-faint: #555555;
+  --icon-color: #ffffff;
+  --switch-off-bg: rgba(255, 255, 255, 0.1);
+  --switch-off-knob: #cccccc;
+  --switch-on-bg: #ffffff;
+  --switch-on-knob: #000000;
+  --placeholder-color: #777777;
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-text: #ffffff;
+  --input-border: rgba(255, 255, 255, 0.1);
+  --btn-primary-bg: #ffffff;
+  --btn-primary-text: #000000;
+  --btn-secondary-bg: rgba(255, 255, 255, 0.08);
+  --btn-secondary-border: rgba(255, 255, 255, 0.12);
+  --btn-secondary-text: #ffffff;
+  --btn-accent-bg: rgba(255, 255, 255, 0.1);
+  --btn-accent-border: rgba(255, 255, 255, 0.15);
+  --btn-accent-text: #ffffff;
+  --gradient-card: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+  --radio-border: rgba(255, 255, 255, 0.2);
+  --radio-active: #ffffff;
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --modal-bg: #0d0d0d;
+  --modal-border: rgba(255, 255, 255, 0.1);
+  --nav-bg: #000000;
+  --nav-border: rgba(255, 255, 255, 0.06);
+  --spinner-border: rgba(255, 255, 255, 0.1);
+  --spinner-active: #ffffff;
+  --accent: #ffffff;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+/* ==================== LIGHT THEME ==================== */
+.light-theme {
+  --page-bg: #ffffff;
+  --card-bg: #f5f5f5;
+  --card-border: #e0e0e0;
+  --glass-bg: rgba(0, 0, 0, 0.04);
+  --glass-blur: none;
+  --glass-border: 0.5px solid rgba(0, 0, 0, 0.08);
+  --glass-border-accent: 0.5px solid rgba(0, 0, 0, 0.12);
+  --divider-border: 0.5px solid rgba(0, 0, 0, 0.06);
+  --text-primary: #1a1a1a;
+  --text-secondary: #2a2a2a;
+  --text-tertiary: #666666;
+  --text-muted: #888888;
+  --text-faint: #aaaaaa;
+  --icon-color: #1a1a1a;
+  --switch-off-bg: rgba(0, 0, 0, 0.1);
+  --switch-off-knob: #999999;
+  --switch-on-bg: #1a1a1a;
+  --switch-on-knob: #ffffff;
+  --placeholder-color: #999999;
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-text: #1a1a1a;
+  --input-border: rgba(0, 0, 0, 0.1);
+  --btn-primary-bg: #1a1a1a;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: rgba(0, 0, 0, 0.05);
+  --btn-secondary-border: rgba(0, 0, 0, 0.1);
+  --btn-secondary-text: #1a1a1a;
+  --btn-accent-bg: rgba(0, 0, 0, 0.06);
+  --btn-accent-border: rgba(0, 0, 0, 0.12);
+  --btn-accent-text: #1a1a1a;
+  --gradient-card: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.02) 100%);
+  --radio-border: rgba(0, 0, 0, 0.15);
+  --radio-active: #1a1a1a;
+  --overlay-bg: rgba(0, 0, 0, 0.3);
+  --modal-bg: #ffffff;
+  --modal-border: rgba(0, 0, 0, 0.08);
+  --nav-bg: #ffffff;
+  --nav-border: rgba(0, 0, 0, 0.06);
+  --spinner-border: rgba(0, 0, 0, 0.1);
+  --spinner-active: #1a1a1a;
+  --accent: #1a1a1a;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#root {
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+}
+
+.dark-surface {
+  --page-bg: #000000;
+  --card-bg: #0d0d0d;
+  --card-border: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #999999;
+  --text-muted: #777777;
+  --text-faint: #555555;
+  color: #ffffff;
+  background: #000000 !important;
+}
+
+.dark-surface .text-white,
+.dark-surface [class*="text-white/"] {
+  color: #ffffff !important;
+}
+
+.dark-surface .text-gray-300,
+.dark-surface .text-gray-400,
+.dark-surface .text-gray-500,
+.dark-surface .text-gray-600 {
+  color: #999999 !important;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+}
+
+/* ==================== THEME OVERRIDES ==================== */
+.light-theme .bg-black { background-color: #ffffff !important; }
+.light-theme .bg-gray-900 { background-color: #f5f5f5 !important; }
+.light-theme .bg-gray-800 { background-color: #e9e9e9 !important; }
+.light-theme .bg-gray-700 { background-color: #d9d9d9 !important; }
+.light-theme .text-white { color: #1a1a1a !important; }
+.light-theme .text-gray-300 { color: #555555 !important; }
+.light-theme .text-gray-400 { color: #666666 !important; }
+.light-theme .text-gray-500 { color: #777777 !important; }
+.light-theme .text-gray-600 { color: #888888 !important; }
+.light-theme .border-gray-800 { border-color: #e0e0e0 !important; }
+.light-theme .border-gray-700 { border-color: #d0d0d0 !important; }
+.light-theme .border-gray-600 { border-color: #c0c0c0 !important; }
+.light-theme input::placeholder { color: #999999 !important; }
+.light-theme input { color: #1a1a1a; }
+
+/* ==================== GLASSMORPHISM ==================== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  color: var(--text-primary);
+}
+
+.glass-accent {
+  background: var(--btn-accent-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--btn-accent-border);
+  color: var(--btn-accent-text);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  color: var(--text-primary);
+}
+
+.glass-tile {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  color: var(--text-primary);
+}
+
+.glass-pill {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  color: var(--text-primary);
+}
+
+/* ==================== BUTTONS ==================== */
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+}
+
+.btn-secondary {
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
+}
+
+.btn-accent {
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
+  border: 1px solid var(--btn-accent-border);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-gradient {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+/* legacy compat - maps to glass now */
+.btn-emerald {
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
+  border: 1px solid var(--btn-accent-border);
+}
+
+.glass-emerald {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  color: var(--text-primary);
+}
+
+/* ==================== STORY RING (gray glass) ==================== */
+.story-ring {
+  background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+  padding: 2px;
+  border-radius: 50%;
+}
+
+.light-theme .story-ring {
+  background: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.05));
+}
+
+.story-ring-seen {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px;
+  border-radius: 50%;
+}
+
+.light-theme .story-ring-seen {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== SWITCH ==================== */
+.switch-track {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  position: relative;
+  transition: background 0.25s ease;
+  cursor: pointer;
+}
+
+.switch-track.on {
+  background: var(--switch-on-bg);
+}
+
+.switch-track.off {
+  background: var(--switch-off-bg);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.switch-track.on .switch-knob {
+  transform: translateX(23px);
+  background: var(--switch-on-knob);
+}
+
+.switch-track.off .switch-knob {
+  transform: translateX(3px);
+  background: var(--switch-off-knob);
+}
+
+/* ==================== UTILITIES ==================== */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-140px) translateX(var(--drift, 0px)) scale(1.4); opacity: 0; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutUp {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up { animation: slide-up 0.3s ease-out; }
+.animate-fade-in { animation: fade-in 0.2s ease-out; }
+
+/* ==================== RAW ICON (no glass background) ==================== */
+.raw-icon {
+  background: transparent;
+  border: none;
+  color: var(--icon-color);
+}
+
+.raw-icon-active {
+  color: var(--text-primary);
+}
+
+/* ==================== GAME CARDS ==================== */
+.game-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.game-card:hover {
+  border-color: var(--glass-border-accent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ==================== INPUT STYLES ==================== */
+.input-field {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+.input-field:focus {
+  border-color: var(--text-primary);
+}
+
+.input-field::placeholder {
+  color: var(--placeholder-color);
+}
+
+/* ==================== MODAL ==================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--modal-bg);
+  border: 1px solid var(--modal-border);
+  border-radius: 24px;
+  padding: 24px;
+  max-width: 360px;
+  width: calc(100% - 48px);
+  animation: slide-up 0.3s ease-out;
+}
+
+/* ==================== LEGAL PAGES HEADING OVERRIDE ==================== */
+.min-h-screen h2.text-2xl {
+  color: var(--text-primary);
+}
+
+/* ==================== THEME OVERRIDES FOR GRAY CLASSES ==================== */
+.light-theme .text-gray-300 { color: #555555 !important; }
+.light-theme .text-gray-400 { color: #666666 !important; }
+.light-theme .text-gray-500 { color: #777777 !important; }
+.light-theme .text-gray-600 { color: #888888 !important; }
+.light-theme .bg-gray-900 { background-color: #f5f5f5 !important; }
+.light-theme .bg-gray-800 { background-color: #e9e9e9 !important; }
+.light-theme .border-gray-800 { border-color: #e0e0e0 !important; }

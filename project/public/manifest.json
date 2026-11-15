@@ -1,0 +1,18 @@
+{
+  "name": "Viral - Earn Money Online",
+  "short_name": "Viral",
+  "description": "Earn money by completing offers and tasks",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/file_00000000b40c81f48d7128b44202ec98.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
